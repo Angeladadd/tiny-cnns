@@ -11,6 +11,7 @@
 #include <memory>
 #include <iomanip>
 #include <limits>
+#include <cstdlib>
 
 // C++20 single-file CIFAR-VGG8 inference implementation
 // No external dependencies, FP32, multithreaded
@@ -352,16 +353,71 @@ public:
 
 } // namespace cifar_vgg8
 
-int main() {
+void print_usage(const char* program_name) {
+    std::cout << "Usage: " << program_name << " [OPTIONS]\n\n";
+    std::cout << "CIFAR-VGG8 C++20 Implementation\n";
+    std::cout << "Single-file, no external dependencies\n";
+    std::cout << "FP32 precision, multithreaded\n\n";
+    std::cout << "Options:\n";
+    std::cout << "  --batch-size <size>    Set batch size for benchmarking (default: 1)\n";
+    std::cout << "  --iterations <num>     Set number of iterations for benchmarking (default: 100)\n";
+    std::cout << "  --help, -h             Show this help message\n\n";
+    std::cout << "Examples:\n";
+    std::cout << "  " << program_name << "                           # Run with default settings\n";
+    std::cout << "  " << program_name << " --batch-size 4 --iterations 50\n";
+    std::cout << "  " << program_name << " --batch-size 8 --iterations 25\n";
+}
+
+int main(int argc, char* argv[]) {
+    // Default values
+    int batch_size = 1;
+    int num_iterations = 100;
+    
+    // Parse command line arguments
+    for (int i = 1; i < argc; ++i) {
+        std::string arg = argv[i];
+        
+        if (arg == "--help" || arg == "-h") {
+            print_usage(argv[0]);
+            return 0;
+        }
+        else if (arg == "--batch-size") {
+            if (i + 1 < argc) {
+                batch_size = std::atoi(argv[++i]);
+                if (batch_size <= 0) {
+                    std::cerr << "Error: batch size must be positive\n";
+                    return 1;
+                }
+            } else {
+                std::cerr << "Error: --batch-size requires a value\n";
+                return 1;
+            }
+        }
+        else if (arg == "--iterations") {
+            if (i + 1 < argc) {
+                num_iterations = std::atoi(argv[++i]);
+                if (num_iterations <= 0) {
+                    std::cerr << "Error: iterations must be positive\n";
+                    return 1;
+                }
+            } else {
+                std::cerr << "Error: --iterations requires a value\n";
+                return 1;
+            }
+        }
+        else {
+            std::cerr << "Error: unknown option '" << arg << "'\n";
+            std::cerr << "Use --help for usage information\n";
+            return 1;
+        }
+    }
+    
     std::cout << "CIFAR-VGG8 C++20 Implementation\n";
     std::cout << "Single-file, no external dependencies\n";
     std::cout << "FP32 precision, multithreaded\n\n";
     
-    // Run benchmark with different configurations
-    cifar_vgg8::Benchmark::run_inference_benchmark(50, 1);
-    
-    std::cout << "\nBenchmark with larger batch:\n";
-    cifar_vgg8::Benchmark::run_inference_benchmark(20, 4);
+    // Run benchmark with user-specified or default configurations
+    cifar_vgg8::Benchmark::run_inference_benchmark(num_iterations, batch_size);
     
     return 0;
 }

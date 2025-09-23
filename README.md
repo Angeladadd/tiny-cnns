@@ -38,12 +38,32 @@ g++ -std=c++20 -O3 -pthread -march=native cifar_vgg8.cpp -o cifar_vgg8
 ## Usage
 
 ```bash
-./cifar_vgg8
+./cifar_vgg8 [OPTIONS]
 ```
 
-The program will run a benchmark with:
-- 50 iterations with batch size 1
-- 20 iterations with batch size 4
+### Command Line Options
+
+- `--batch-size <size>`: Set batch size for benchmarking (default: 1)
+- `--iterations <num>`: Set number of iterations for benchmarking (default: 100)
+- `--help, -h`: Show help message
+
+### Examples
+
+```bash
+# Run with default settings (100 iterations, batch size 1)
+./cifar_vgg8
+
+# Custom batch size and iterations
+./cifar_vgg8 --batch-size 4 --iterations 50
+
+# Large batch size with fewer iterations
+./cifar_vgg8 --batch-size 8 --iterations 25
+
+# Show help
+./cifar_vgg8 --help
+```
+
+The program will run a benchmark with the specified configuration and display:
 - Performance metrics (latency, throughput)
 - Sample inference output
 
