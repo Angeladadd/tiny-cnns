@@ -1,7 +1,7 @@
 # Makefile for CIFAR-VGG8 implementation
 
 CXX = g++
-CXXFLAGS = -std=c++20 -O3 -pthread -march=native -Wall -Wextra
+CXXFLAGS = -std=c++20 -O3 -fopenmp -march=native -Wall -Wextra
 TARGET = benchmark
 LEGACY_TARGET = cifar_vgg8
 SOURCE = benchmark.cpp
@@ -21,7 +21,7 @@ legacy: $(LEGACY_TARGET)
 $(LEGACY_TARGET): $(LEGACY_SOURCE)
 	$(CXX) $(CXXFLAGS) $(LEGACY_SOURCE) -o $(LEGACY_TARGET)
 
-debug: CXXFLAGS = -std=c++20 -g -pthread -Wall -Wextra -DDEBUG
+debug: CXXFLAGS = -std=c++20 -g -fopenmp -Wall -Wextra -DDEBUG
 debug: $(TARGET)
 
 run: $(TARGET)
@@ -31,10 +31,10 @@ clean:
 	rm -f $(TARGET) $(LEGACY_TARGET)
 
 # Additional targets for different optimization levels
-fast: CXXFLAGS = -std=c++20 -O3 -pthread -march=native -DNDEBUG -flto
+fast: CXXFLAGS = -std=c++20 -O3 -fopenmp -march=native -DNDEBUG -flto
 fast: $(TARGET)
 
-profile: CXXFLAGS = -std=c++20 -O2 -pthread -march=native -pg
+profile: CXXFLAGS = -std=c++20 -O2 -fopenmp -march=native -pg
 profile: $(TARGET)
 
 help:

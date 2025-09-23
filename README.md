@@ -9,7 +9,7 @@ A C++20 implementation of CIFAR-VGG8 inference with no external dependencies and
 - **C++20 standard**: Modern C++ features for clean, efficient code
 - **No external dependencies**: Only standard library
 - **FP32 precision**: 32-bit floating point operations
-- **Multithreaded**: Parallel convolution operations using `std::async`
+- **Multithreaded**: Parallel convolution operations using **OpenMP**
 - **CIFAR-10 compatible**: 32×32×3 input images
 - **VGG8 architecture**: 6 conv layers + 2 pooling + GAP + FC head
 
@@ -46,10 +46,10 @@ make legacy         # Build original cifar_vgg8 executable
 ### Manual compilation:
 ```bash
 # New version
-g++ -std=c++20 -O3 -pthread -march=native benchmark.cpp -o benchmark
+g++ -std=c++20 -O3 -fopenmp -march=native benchmark.cpp -o benchmark
 
 # Legacy version  
-g++ -std=c++20 -O3 -pthread -march=native cifar_vgg8.cpp -o cifar_vgg8
+g++ -std=c++20 -O3 -fopenmp -march=native cifar_vgg8.cpp -o cifar_vgg8
 ```
 
 ## Usage

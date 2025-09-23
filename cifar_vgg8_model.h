@@ -5,17 +5,18 @@
 #include <array>
 #include <random>
 #include <chrono>
-#include <thread>
-#include <future>
 #include <algorithm>
 #include <cmath>
 #include <numeric>
 #include <memory>
 #include <iomanip>
 #include <limits>
+#ifdef _OPENMP
+#include <omp.h>
+#endif
 
 // C++20 CIFAR-VGG8 model implementation
-// No external dependencies, FP32, multithreaded
+// No external dependencies, FP32, multithreaded with OpenMP
 
 namespace cifar_vgg8 {
 
@@ -85,51 +86,34 @@ public:
         
         Tensor output(batch, out_h, out_w, out_c);
         
-        // Parallel convolution across batch and output channels
-        const int num_threads = std::thread::hardware_concurrency();
-        std::vector<std::future<void>> futures;
+        // Parallel convolution using OpenMP
+        int total_work = batch * out_c;
         
-        auto conv_worker = [&](int start_idx, int end_idx) {
-            for (int idx = start_idx; idx < end_idx; ++idx) {
-                int b = idx / out_c;
-                int oc = idx % out_c;
-                
-                for (int oh = 0; oh < out_h; ++oh) {
-                    for (int ow = 0; ow < out_w; ++ow) {
-                        float sum = bias[oc];
-                        
-                        for (int kh = 0; kh < weights.shape[1]; ++kh) {
-                            for (int kw = 0; kw < weights.shape[2]; ++kw) {
-                                for (int ic = 0; ic < in_c; ++ic) {
-                                    int ih = oh * stride - padding + kh;
-                                    int iw = ow * stride - padding + kw;
-                                    
-                                    if (ih >= 0 && ih < in_h && iw >= 0 && iw < in_w) {
-                                        sum += input.at(b, ih, iw, ic) * weights.at(oc, kh, kw, ic);
-                                    }
+        #pragma omp parallel for schedule(dynamic)
+        for (int idx = 0; idx < total_work; ++idx) {
+            int b = idx / out_c;
+            int oc = idx % out_c;
+            
+            for (int oh = 0; oh < out_h; ++oh) {
+                for (int ow = 0; ow < out_w; ++ow) {
+                    float sum = bias[oc];
+                    
+                    for (int kh = 0; kh < weights.shape[1]; ++kh) {
+                        for (int kw = 0; kw < weights.shape[2]; ++kw) {
+                            for (int ic = 0; ic < in_c; ++ic) {
+                                int ih = oh * stride - padding + kh;
+                                int iw = ow * stride - padding + kw;
+                                
+                                if (ih >= 0 && ih < in_h && iw >= 0 && iw < in_w) {
+                                    sum += input.at(b, ih, iw, ic) * weights.at(oc, kh, kw, ic);
                                 }
                             }
                         }
-                        
-                        output.at(b, oh, ow, oc) = sum;
                     }
+                    
+                    output.at(b, oh, ow, oc) = sum;
                 }
             }
-        };
-        
-        int total_work = batch * out_c;
-        int work_per_thread = std::max(1, total_work / num_threads);
-        
-        for (int i = 0; i < num_threads; ++i) {
-            int start = i * work_per_thread;
-            int end = (i == num_threads - 1) ? total_work : (i + 1) * work_per_thread;
-            if (start < total_work) {
-                futures.push_back(std::async(std::launch::async, conv_worker, start, end));
-            }
-        }
-        
-        for (auto& future : futures) {
-            future.wait();
         }
         
         return output;
@@ -139,8 +123,9 @@ public:
 // ReLU activation
 Tensor relu(const Tensor& input) {
     Tensor output = input;
-    for (auto& val : output.data) {
-        val = std::max(0.0f, val);
+    #pragma omp parallel for
+    for (size_t i = 0; i < output.data.size(); ++i) {
+        output.data[i] = std::max(0.0f, output.data[i]);
     }
     return output;
 }

@@ -14,7 +14,7 @@ echo "✅ Source file found: cifar_vgg8.cpp"
 
 # Check compilation
 echo "🔨 Compiling..."
-if g++ -std=c++20 -O3 -pthread -march=native -Wall -Wextra cifar_vgg8.cpp -o cifar_vgg8_test; then
+if g++ -std=c++20 -O3 -fopenmp -march=native -Wall -Wextra cifar_vgg8.cpp -o cifar_vgg8_test; then
     echo "✅ Compilation successful"
 else
     echo "❌ Compilation failed"
@@ -36,7 +36,9 @@ if grep -q "std::" cifar_vgg8.cpp && grep -q "auto" cifar_vgg8.cpp; then
 fi
 
 # Check threading
-if grep -q "std::thread\|std::async" cifar_vgg8.cpp; then
+if grep -q "pragma omp\|fopenmp" cifar_vgg8.cpp; then
+    echo "✅ OpenMP multithreading implemented"
+elif grep -q "std::thread\|std::async" cifar_vgg8.cpp; then
     echo "✅ Multithreading implemented"
 fi
 
