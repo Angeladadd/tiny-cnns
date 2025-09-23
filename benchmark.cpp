@@ -3,10 +3,12 @@
 #include <vector>
 #include <random>
 #include <chrono>
-#include <thread>
 #include <string>
 #include <cstring>
 #include <iomanip>
+#ifdef _OPENMP
+#include <omp.h>
+#endif
 
 // Command line argument parsing and benchmarking logic
 class BenchmarkRunner {
@@ -76,7 +78,11 @@ public:
         std::cout << "==============================\n";
         std::cout << "Batch size: " << batch_size << "\n";
         std::cout << "Iterations: " << num_iterations << "\n";
-        std::cout << "Hardware threads: " << std::thread::hardware_concurrency() << "\n\n";
+        #ifdef _OPENMP
+        std::cout << "OpenMP threads: " << omp_get_max_threads() << "\n\n";
+        #else
+        std::cout << "OpenMP not available\n\n";
+        #endif
         
         cifar_vgg8::VGG8 model;
         
