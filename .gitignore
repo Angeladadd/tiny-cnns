@@ -37,6 +37,7 @@
 *.out
 *.app
 cifar_vgg8
+benchmark
 
 # Temporary files
 demo
