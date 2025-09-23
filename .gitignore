@@ -36,6 +36,11 @@
 *.exe
 *.out
 *.app
+cifar_vgg8
+
+# Temporary files
+demo
+*_test
 
 # debug information files
 *.dwo

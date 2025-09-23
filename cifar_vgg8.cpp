@@ -9,6 +9,8 @@
 #include <cmath>
 #include <numeric>
 #include <memory>
+#include <iomanip>
+#include <limits>
 
 // C++20 single-file CIFAR-VGG8 inference implementation
 // No external dependencies, FP32, multithreaded
