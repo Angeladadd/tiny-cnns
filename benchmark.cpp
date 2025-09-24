@@ -15,7 +15,7 @@
 class BenchmarkRunner {
 private:
     int batch_size = 1;
-    int num_iterations = 100;
+    int num_iterations = 10;
     bool help = false;
     std::string model_type = "resnet8";
     
@@ -76,7 +76,7 @@ public:
         std::cout << "Usage: ./benchmark [OPTIONS]\n\n";
         std::cout << "OPTIONS:\n";
         std::cout << "  -b, --batch-size NUM    Set batch size (default: 1)\n";
-        std::cout << "  -i, --iterations NUM    Set number of iterations (default: 100)\n";
+        std::cout << "  -i, --iterations NUM    Set number of iterations (default: 10)\n";
         std::cout << "  -m, --model MODEL       Set model type: vgg8, resnet8 (default: resnet8)\n";
         std::cout << "  -h, --help              Show this help message\n\n";
         std::cout << "Examples:\n";

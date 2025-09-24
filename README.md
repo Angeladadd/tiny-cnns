@@ -63,13 +63,13 @@ g++ -std=c++20 -O3 -fopenmp -march=native benchmark.cpp -o benchmark
 
 **Options:**
 - `-b, --batch-size NUM`    Set batch size (default: 1)
-- `-i, --iterations NUM`    Set number of iterations (default: 100)
+- `-i, --iterations NUM`    Set number of iterations (default: 10)
 - `-m, --model MODEL`       Set model type: vgg8, resnet8 (default: resnet8)
 - `-h, --help`              Show help message
 
 **Examples:**
 ```bash
-./benchmark                              # Use defaults (resnet8, batch=1, iterations=100)
+./benchmark                              # Use defaults (resnet8, batch=1, iterations=10)
 ./benchmark --model resnet8 --batch-size 4 --iterations 50
 ./benchmark -m vgg8 -b 8 -i 25          # Short flags
 ./benchmark --help                       # Show usage information
