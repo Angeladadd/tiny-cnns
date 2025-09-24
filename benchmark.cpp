@@ -1,4 +1,5 @@
 #include "cifar_vgg8_model.h"
+#include "cifar_resnet8_model.h"
 #include <iostream>
 #include <vector>
 #include <random>
@@ -16,6 +17,7 @@ private:
     int batch_size = 1;
     int num_iterations = 100;
     bool help = false;
+    std::string model_type = "vgg8";
     
 public:
     void parse_arguments(int argc, char* argv[]) {
@@ -33,6 +35,19 @@ public:
                     num_iterations = std::stoi(argv[++i]);
                 } else {
                     std::cerr << "Error: --iterations requires a value\n";
+                    print_usage();
+                    exit(1);
+                }
+            } else if (std::strcmp(argv[i], "--model") == 0 || std::strcmp(argv[i], "-m") == 0) {
+                if (i + 1 < argc) {
+                    model_type = argv[++i];
+                    if (model_type != "vgg8" && model_type != "resnet8") {
+                        std::cerr << "Error: model must be 'vgg8' or 'resnet8'\n";
+                        print_usage();
+                        exit(1);
+                    }
+                } else {
+                    std::cerr << "Error: --model requires a value\n";
                     print_usage();
                     exit(1);
                 }
@@ -57,15 +72,16 @@ public:
     }
     
     void print_usage() {
-        std::cout << "CIFAR-VGG8 Benchmark\n";
+        std::cout << "CIFAR CNN Benchmark\n";
         std::cout << "Usage: ./benchmark [OPTIONS]\n\n";
         std::cout << "OPTIONS:\n";
         std::cout << "  -b, --batch-size NUM    Set batch size (default: 1)\n";
         std::cout << "  -i, --iterations NUM    Set number of iterations (default: 100)\n";
+        std::cout << "  -m, --model MODEL       Set model type: vgg8, resnet8 (default: vgg8)\n";
         std::cout << "  -h, --help              Show this help message\n\n";
         std::cout << "Examples:\n";
-        std::cout << "  ./benchmark --batch-size 4 --iterations 50\n";
-        std::cout << "  ./benchmark -b 8 -i 25\n";
+        std::cout << "  ./benchmark --model resnet8 --batch-size 4 --iterations 50\n";
+        std::cout << "  ./benchmark -m vgg8 -b 8 -i 25\n";
     }
     
     void run_benchmark() {
@@ -74,8 +90,10 @@ public:
             return;
         }
         
-        std::cout << "CIFAR-VGG8 Inference Benchmark\n";
+        std::string model_name = (model_type == "vgg8") ? "CIFAR-VGG8" : "CIFAR-ResNet8";
+        std::cout << model_name << " Inference Benchmark\n";
         std::cout << "==============================\n";
+        std::cout << "Model: " << model_type << "\n";
         std::cout << "Batch size: " << batch_size << "\n";
         std::cout << "Iterations: " << num_iterations << "\n";
         #ifdef _OPENMP
@@ -84,18 +102,35 @@ public:
         std::cout << "OpenMP not available\n\n";
         #endif
         
-        cifar_vgg8::VGG8 model;
-        
         // Create random input data (CIFAR-10 format: 32x32x3)
-        cifar_vgg8::Tensor input(batch_size, 32, 32, 3);
         std::random_device rd;
         std::mt19937 gen(rd());
         std::uniform_real_distribution<float> dist(-1.0f, 1.0f);
         
-        for (auto& val : input.data) {
-            val = dist(gen);
+        if (model_type == "vgg8") {
+            cifar_vgg8::VGG8 model;
+            cifar_vgg8::Tensor input(batch_size, 32, 32, 3);
+            
+            for (auto& val : input.data) {
+                val = dist(gen);
+            }
+            
+            run_model_benchmark(model, input);
+        } else { // resnet8
+            cifar_resnet8::ResNet8 model;
+            cifar_resnet8::Tensor input(batch_size, 32, 32, 3);
+            
+            for (auto& val : input.data) {
+                val = dist(gen);
+            }
+            
+            run_model_benchmark(model, input);
         }
-        
+    }
+
+private:
+    template<typename ModelType, typename TensorType>
+    void run_model_benchmark(ModelType& model, TensorType& input) {
         // Warmup runs
         std::cout << "Warming up...\n";
         for (int i = 0; i < 5; ++i) {
@@ -142,7 +177,7 @@ public:
 };
 
 int main(int argc, char* argv[]) {
-    std::cout << "CIFAR-VGG8 C++20 Implementation\n";
+    std::cout << "CIFAR CNN C++20 Implementation\n";
     std::cout << "Single-file, no external dependencies\n";
     std::cout << "FP32 precision, multithreaded\n\n";
     
