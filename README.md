@@ -32,29 +32,17 @@ Input: 32×32×3
 
 ## Compilation
 
-### New modular version (recommended):
 ```bash
 make                 # Build benchmark with command-line args
 make all            # Same as above
 ```
 
-### Legacy single-file version:
-```bash
-make legacy         # Build original cifar_vgg8 executable
-```
-
 ### Manual compilation:
 ```bash
-# New version
 g++ -std=c++20 -O3 -fopenmp -march=native benchmark.cpp -o benchmark
-
-# Legacy version  
-g++ -std=c++20 -O3 -fopenmp -march=native cifar_vgg8.cpp -o cifar_vgg8
 ```
 
 ## Usage
-
-### New benchmark executable with command-line args:
 
 ```bash
 ./benchmark [OPTIONS]
@@ -73,25 +61,26 @@ g++ -std=c++20 -O3 -fopenmp -march=native cifar_vgg8.cpp -o cifar_vgg8
 ./benchmark --help                       # Show usage information
 ```
 
-### Legacy version:
-```bash
-./cifar_vgg8
-```
-Runs with fixed parameters: 50 iterations (batch=1) + 20 iterations (batch=4).
-
 ## Performance
 
-The implementation automatically detects available hardware threads and parallelizes convolution operations. Performance will vary based on hardware, but typical results include:
+The implementation automatically detects available hardware threads and parallelizes convolution operations. Performance will vary based on hardware.
 
-- **Latency**: ~300-400ms per image on modern CPUs
-- **Throughput**: ~3-4 images/second
-- **Memory**: Minimal memory footprint with efficient tensor operations
+Three experiments were conducted on an Intel Xeon Gold 6248 (2.5 GHz) processor:
+- 1 CPU, 1 Thread
+    - Throughput: 1.56 images/s
+    - Per-image latency: 641.801 ms/image
+- 8 CPUs, 8 Threads
+    - Throughput: 11.06 images/s
+    - Per-image latency: 90.388 ms/image
+- 8 CPUs, 16 Threads
+    - Throughput: 20.84 images/s
+    - Per-image latency: 47.986 ms/image
+
 
 ## Implementation Details
 
 - **cifar_vgg8_model.h**: Contains all model classes (Tensor, Conv2D, VGG8, etc.)
 - **benchmark.cpp**: Command-line interface and benchmarking logic
-- **cifar_vgg8.cpp**: Legacy single-file implementation (maintained for compatibility)
 - **Tensor class**: 4D tensor operations (batch, height, width, channels)
 - **Conv2D**: Parallel convolution with Xavier weight initialization
 - **Pooling**: 2×2 max pooling and global average pooling
