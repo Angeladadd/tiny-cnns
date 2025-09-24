@@ -6,7 +6,7 @@ TARGET = benchmark
 LEGACY_TARGET = cifar_vgg8
 SOURCE = benchmark.cpp
 LEGACY_SOURCE = cifar_vgg8.cpp
-HEADER = cifar_vgg8_model.h
+HEADER = cifar_vgg8_model.h cifar_resnet8_model.h
 
 .PHONY: all clean run debug legacy
 
