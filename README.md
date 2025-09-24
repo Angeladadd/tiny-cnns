@@ -64,38 +64,31 @@ g++ -std=c++20 -O3 -fopenmp -march=native benchmark.cpp -o benchmark
 **Options:**
 - `-b, --batch-size NUM`    Set batch size (default: 1)
 - `-i, --iterations NUM`    Set number of iterations (default: 100)
-- `-m, --model MODEL`       Set model type: vgg8, resnet8 (default: vgg8)
+- `-m, --model MODEL`       Set model type: vgg8, resnet8 (default: resnet8)
 - `-h, --help`              Show help message
 
 **Examples:**
 ```bash
-./benchmark                              # Use defaults (vgg8, batch=1, iterations=100)
+./benchmark                              # Use defaults (resnet8, batch=1, iterations=100)
 ./benchmark --model resnet8 --batch-size 4 --iterations 50
 ./benchmark -m vgg8 -b 8 -i 25          # Short flags
 ./benchmark --help                       # Show usage information
 ```
 
-## Performance
+# Performance
 
-The implementation automatically detects available hardware threads and parallelizes convolution operations. Performance will vary based on hardware.
+The implementation automatically detects available hardware threads and parallelizes convolution operations. Performance will vary based on hardware.  
 
-### VGG8 Performance
-Three experiments were conducted on an Intel Xeon Gold 6248 (2.5 GHz) processor:
-- 1 CPU, 1 Thread
-    - Throughput: 1.56 images/s
-    - Per-image latency: 641.801 ms/image
-- 8 CPUs, 8 Threads
-    - Throughput: 11.06 images/s
-    - Per-image latency: 90.388 ms/image
-- 8 CPUs, 16 Threads
-    - Throughput: 20.84 images/s
-    - Per-image latency: 47.986 ms/image
+## Benchmark Results (Intel Xeon Gold 6248, 2.5 GHz)
 
-### ResNet8 Performance
-ResNet8 shows significantly better performance due to its more efficient architecture:
-- Typical performance: ~3x faster than VGG8
-- Example: ~57 images/s vs ~6 images/s for VGG8 (single thread)
-
+| Model   | Configuration     | Throughput (images/s) | Per-image Latency (ms/image) |
+|---------|-------------------|------------------------|-------------------------------|
+| VGG8    | 1 CPU, 1 Thread   | 1.56                   | 641.801                       |
+| VGG8    | 8 CPUs, 8 Threads | 11.06                  | 90.388                        |
+| VGG8    | 8 CPUs, 16 Threads| 20.84                  | 47.986                        |
+| ResNet8 | 1 CPU, 1 Thread   | 18.15                  | 55.110                        |
+| ResNet8 | 8 CPUs, 8 Threads | 123.06                 | 8.126                         |
+| ResNet8 | 8 CPUs, 16 Threads| 199.56                 | 5.011                         |
 
 ## Implementation Details
 
