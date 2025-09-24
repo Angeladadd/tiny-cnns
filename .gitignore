@@ -42,6 +42,7 @@ benchmark
 # Temporary files
 demo
 *_test
+logs
 
 # debug information files
 *.dwo

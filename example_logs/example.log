@@ -1,0 +1,36 @@
+CIFAR-VGG8 C++20 Implementation
+Single-file, no external dependencies
+FP32 precision, multithreaded
+
+CIFAR-VGG8 Inference Benchmark
+==============================
+Batch size: 1
+Iterations: 50
+OpenMP threads: 8
+
+Warming up...
+Running benchmark...
+Completed 10/50 iterations
+Completed 20/50 iterations
+Completed 30/50 iterations
+Completed 40/50 iterations
+Completed 50/50 iterations
+
+Benchmark Results:
+==================
+Total time: 4519.4 ms
+Average latency: 90.388 ms/batch
+Throughput: 11.06 images/s
+Per-image latency: 90.388 ms/image
+
+Sample inference output (logits):
+Class 0: 0.49687
+Class 1: 1.02717
+Class 2: 0.32913
+Class 3: -0.53493
+Class 4: -0.06793
+Class 5: -0.00050
+Class 6: 0.36565
+Class 7: 0.27599
+Class 8: -0.06671
+Class 9: 0.20817
